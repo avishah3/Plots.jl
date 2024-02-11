@@ -1,3 +1,5 @@
+using RecipesBase
+
 const _series_recipe_deps = Dict()
 
 series_recipe_dependencies(st::Symbol, deps::Symbol...) = _series_recipe_deps[st] = deps  # COV_EXCL_LINE
@@ -405,6 +407,14 @@ end
 
 # create a bar plot as a filled step function
 @recipe function f(::Type{Val{:bar}}, x, y, z)  # COV_EXCL_LINE
+    # check if 'y' is a named tuple and handle accordingly
+    if typeof(y) == NamedTuple
+        names = collect(keys(y))
+        values = collect(values(y))
+        plotnames = map(string, names)
+        x = plotnames
+        y = values
+    end
     ywiden --> false
     procx, procy, xscale, yscale, _ = _preprocess_barlike(plotattributes, x, y)
     nx, ny = length(procx), length(procy)
